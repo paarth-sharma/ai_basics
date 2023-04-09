@@ -67,7 +67,6 @@ def evaluvate(puzzle, goal):
     priority = np.array( [(0, hn)], dtpriority)
 
 
-
     while True:
         priority = np.sort(priority, kind='mergesort', order=['fn', 'position'])     
         position, fn = priority[0]                                                 
@@ -181,7 +180,6 @@ def evaluvate_misplaced(puzzle, goal):
                         
     return state, len(priority)
 
-
 puzzle = []
 print(" Input vals from 0-8 for start state ")
 for i in range(0,9):
@@ -194,8 +192,6 @@ print(" Input vals from 0-8 for goal state ")
 for i in range(0,9):
     x = int(input())
     goal.append(x)
-
-
 
 n = int(input("1. Manhattan distance \n2. Misplaced tiles"))
 
