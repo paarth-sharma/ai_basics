@@ -1,0 +1,1045 @@
+8 puzzle using BEST 
+
+# to use the deep copy fucntion
+import copy 
+
+# global variable steps to store teh count of steps
+steps = 0
+
+# globally defining the initial state s
+s = [[1,2,3],[8,0,4],[7,6,5]]
+
+# globally defining the final state g
+g = [[2,0,3],[1,8,4],[7,6,5]]
+
+# globally defining an empty array to serve as memory to the visited states
+visited = []
+
+# this function compares the current state passed as parameter and the global goal state
+def compare(curr):
+    return curr == g
+    
+# this function finds the positon indeces of the blank tile
+def blankTile(s):
+    # for each of the rows in the given state
+    for i in range(len(s)):
+        # for each of the element in each row
+        for j in range(len(s[0])):
+            # check if the selcted element is equal to the element to be found
+            if s[i][j] == 0:
+                # return the indices of row and column if yes
+                return [i,j]
+    # in case of error return -1
+    return -1
+
+# this function creates the new state by shifting the blank tile upwards
+def up(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the row is 0 then upwards motion is not possible
+    if(i==0):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile above it 
+    temp[i-1][j],temp[i][j] = temp[i][j],temp[i-1][j]
+    # return the new state formed
+    return temp
+    
+# this function creates the new state by shifting the blank tile downwards
+def down(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the row is last element then downwards motion is not possible
+    if (i == len(curr)-1):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile below it 
+    temp[i][j],temp[i+1][j] = temp[i+1][j],temp[i][j]
+    # return the new state formed
+    return temp
+    
+# this function creates the new state by shifting the blank tile towards the left
+def left(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the col is first element then left side motion is not possible
+    if (j == 0):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile to its left
+    temp[i][j],temp[i][j-1] = temp[i][j-1],temp[i][j]
+    # return the new state formed
+    return temp
+
+# this function creates the new state by shifting the blank tile towards the right
+def right(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the col is the last element then left side motion is not possible
+    if (j == len(curr[0])-1):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile to its right
+    temp[i][j],temp[i][j+1] = temp[i][j+1],temp[i][j]
+    # return the new state formed
+    return temp
+
+# this function is used to explore the current state: curr
+def getStates(curr):
+    # create an empty array states to store the newly formed states
+    states = []
+    # move in every direction once and append the new state to the states array
+    states.append(up(curr))
+    states.append(down(curr))
+    states.append(right(curr))
+    states.append(left(curr))
+    
+    # define an empty array that stores all the new states that are not already in the visited array
+    arr = []
+    # for each state in states array
+    for i in states:
+        # check if the state is in the visited array
+        if (i not in visited):
+            # if not then append it to the array just formed
+            arr.append(i)
+            
+    # if there are new states formed then the length of arr will be > 0
+    if(len(arr)==0):
+        # if not then return -1 for failure: no new states
+        return -1
+    # else follow the BEST FIRST SEARCH and return the minimum of the states
+    return min(arr)
+
+# this function is used to print the state formed in a board format
+def display(state):
+    for i in state:
+        for j in i:
+            print(j, end='')
+        print()
+    print()
+
+# this function is the driver function 
+def EightPuzzle():
+    # if the inital state is already the goal state then return the same thing back
+    if compare(s):
+        return s
+    # else define a current state
+    curr = s
+    # call on teh globally defined steps variable
+    global steps
+    # while the current state is not same as goal state
+    while(compare(curr)==0):
+            # increment the steps by one
+            steps+=1
+            # display the current state
+            print("step ",steps)
+            display(curr)
+            # add this state to the visited state array
+            visited.append(curr)
+            # find the new current state, the next move, as per algorithm
+            curr = getStates(curr)
+            # if no new state is available: fialure returned by getStates function
+            if (curr == -1):
+                # print no solution
+                return "no solution"
+    # else return the current state, which will be goal state after the while loop ends
+    return curr
+
+# call the driver function
+EightPuzzle()
+# print the total number of steps required
+print("The total number of steps are: ",steps)
+print ("*********END*********")
+
+
+
+
+
+******8 puzzle using  steepest hill climb*
+
+import copy 
+
+# global variable steps to store teh count of steps
+steps = 0
+
+# globally defining the initial state s
+s = [[1,2,3],[8,0,4],[7,6,5]]
+
+# globally defining the final state g
+g = [[2,0,3],[1,8,4],[7,6,5]]
+
+# globally defining an empty array to serve as memory to the visited states
+visited = []
+
+# this function compares the current state passed as parameter and the global goal state
+def compare(curr):
+    return curr == g
+    
+# this function finds the positon indeces of the blank tile
+def blankTile(s):
+    # for each of the rows in the given state
+    for i in range(len(s)):
+        # for each of the element in each row
+        for j in range(len(s[0])):
+            # check if the selcted element is equal to the element to be found
+            if s[i][j] == 0:
+                # return the indices of row and column if yes
+                return [i,j]
+    # in case of error return -1
+    return -1
+
+# this function creates the new state by shifting the blank tile upwards
+def up(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the row is 0 then upwards motion is not possible
+    if(i==0):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile above it 
+    temp[i-1][j],temp[i][j] = temp[i][j],temp[i-1][j]
+    # return the new state formed
+    return temp
+    
+# this function creates the new state by shifting the blank tile downwards
+def down(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the row is last element then downwards motion is not possible
+    if (i == len(curr)-1):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile below it 
+    temp[i][j],temp[i+1][j] = temp[i+1][j],temp[i][j]
+    # return the new state formed
+    return temp
+    
+# this function creates the new state by shifting the blank tile towards the left
+def left(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the col is first element then left side motion is not possible
+    if (j == 0):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile to its left
+    temp[i][j],temp[i][j-1] = temp[i][j-1],temp[i][j]
+    # return the new state formed
+    return temp
+
+# this function creates the new state by shifting the blank tile towards the right
+def right(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the col is the last element then left side motion is not possible
+    if (j == len(curr[0])-1):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile to its right
+    temp[i][j],temp[i][j+1] = temp[i][j+1],temp[i][j]
+    # return the new state formed
+    return temp
+
+# this function return the heuristic value of the number of misplaced tiles
+def heuristic(s):
+    # intialise heuristic val to 0
+    h_val = 0
+    # for each of the rows in the given state
+    for i in range(len(s)):
+        # for each of the element in each row
+        for j in range(len(s[0])):
+            # check if the selcted element is equal to the element to be found
+            if s[i][j] != g[i][j] :
+                # increment the heuristic
+                h_val +=1 
+    # return the heuristic value
+    return h_val
+    
+# this function is used to explore the current state: curr
+def getStates(curr):
+    # create an empty array states to store the newly formed states
+    states = []
+    # move in every direction once and append the new state to the states array
+    states.append(left(curr))
+    states.append(right(curr))
+    states.append(up(curr))
+    states.append(down(curr))
+    
+    
+    # define an empty array that stores all the new states that are not already in the visited array
+    arr = []
+    # for each state in states array
+    for i in states:
+        # check if the state is in the visited array
+        if (i not in visited):
+            # if not then append it to the array just formed
+            arr.append(i)
+    
+    # if there are new states formed then the length of arr will be > 0
+    if(len(arr)==0):
+        # if not then return -1 for failure: no new states
+        return -1
+    #return min(arr)
+    
+    # else follow the HILL CLIMBING  and return the minimum of the states
+    # create an array to store the heuristic values of each of the state in arr
+    heuristic_array = []
+    # for each state in states array
+    for i in arr:
+        heuristic_array.append(heuristic(i))
+    #print (heuristic_array)
+    #print (min(heuristic_array))
+    #print (heuristic_array.index(min(heuristic_array)))
+    #print (arr[heuristic_array.index(min(heuristic_array))])
+    # find the index of the least heuristic
+    ind = heuristic_array.index(min(heuristic_array))
+    # return the state at that index in arr array
+    return arr[ind]    
+    # create an empty array states to store the newly formed states
+    states = []
+    # move in every direction once and append the new state to the states array
+    states.append(up(curr))
+    states.append(down(curr))
+    states.append(right(curr))
+    states.append(left(curr))
+    
+    # define an empty array that stores all the new states that are not already in the visited array
+    arr = []
+    # for each state in states array
+    for i in states:
+        # check if the state is in the visited array
+        if (i not in visited):
+            # if not then append it to the array just formed
+            arr.append(i)
+            
+    # if there are new states formed then the length of arr will be > 0
+    if(len(arr)==0):
+        # if not then return -1 for failure: no new states
+        return -1
+    # else follow the BEST FIRST SEARCH and return the minimum of the states
+    return min(arr)
+
+# this function is used to print the state formed in a board format
+def display(state):
+    for i in state:
+        for j in i:
+            print(j, end='')
+        print()
+    print()
+
+# this function is the driver function 
+def EightPuzzle():
+    # if the inital state is already the goal state then return the same thing back
+    if compare(s):
+        return s
+    # else define a current state
+    curr = s
+    # call on teh globally defined steps variable
+    global steps
+    
+    # while the current state is not same as goal state
+    while(compare(curr)==0):
+            # increment the steps by one
+            steps+=1
+            # display the current state
+            print("step ",steps)
+            display(curr)
+            # add this state to the visited state array
+            visited.append(curr)
+            # find the new current state, the next move, as per algorithm
+            curr = getStates(curr)
+            # if no new state is available: fialure returned by getStates function
+            if (curr == -1):
+                # print no solution
+                return "no solution"
+    # else return the current state, which will be goal state after the while loop ends
+    return curr
+
+# call the driver function
+EightPuzzle()
+# print the total number of steps required
+print("The total number of steps are: ",steps)
+print ("*********END*********")
+
+
+
+
+
+
+SIMPLE HILL CLIMB
+
+
+# to use the deep copy fucntion
+import copy 
+
+# global variable steps to store teh count of steps
+steps = 0
+
+# globally defining the initial state s
+s = [[1,2,3],[8,0,4],[7,6,5]]
+
+# globally defining the final state g
+g = [[2,0,3],[1,8,4],[7,6,5]]
+
+# globally defining an empty array to serve as memory to the visited states
+visited = []
+
+# this function compares the current state passed as parameter and the global goal state
+def compare(curr):
+    return curr == g
+    
+# this function finds the positon indeces of the blank tile
+def blankTile(s):
+    # for each of the rows in the given state
+    for i in range(len(s)):
+        # for each of the element in each row
+        for j in range(len(s[0])):
+            # check if the selcted element is equal to the element to be found
+            if s[i][j] == 0:
+                # return the indices of row and column if yes
+                return [i,j]
+    # in case of error return -1
+    return -1
+
+# this function creates the new state by shifting the blank tile upwards
+def up(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the row is 0 then upwards motion is not possible
+    if(i==0):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile above it 
+    temp[i-1][j],temp[i][j] = temp[i][j],temp[i-1][j]
+    # return the new state formed
+    return temp
+    
+# this function creates the new state by shifting the blank tile downwards
+def down(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the row is last element then downwards motion is not possible
+    if (i == len(curr)-1):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile below it 
+    temp[i][j],temp[i+1][j] = temp[i+1][j],temp[i][j]
+    # return the new state formed
+    return temp
+    
+# this function creates the new state by shifting the blank tile towards the left
+def left(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the col is first element then left side motion is not possible
+    if (j == 0):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile to its left
+    temp[i][j],temp[i][j-1] = temp[i][j-1],temp[i][j]
+    # return the new state formed
+    return temp
+
+# this function creates the new state by shifting the blank tile towards the right
+def right(curr):
+    # find the indices of the blank tile
+    i,j = blankTile(curr)
+    # if the col is the last element then left side motion is not possible
+    if (j == len(curr[0])-1):
+        # so simply return the same state back
+        return curr
+    # else create a copy of the current state
+    temp = copy.deepcopy(curr)
+    # swap the blank tile and the tile to its right
+    temp[i][j],temp[i][j+1] = temp[i][j+1],temp[i][j]
+    # return the new state formed
+    return temp
+
+# this function return the heuristic value of the number of misplaced tiles
+def heuristic(s):
+    # intialise heuristic val to 0
+    h_val = 0
+    # for each of the rows in the given state
+    for i in range(len(s)):
+        # for each of the element in each row
+        for j in range(len(s[0])):
+            # check if the selcted element is equal to the element to be found
+            if s[i][j] == g[i][j] :
+                # increment the heuristic
+                h_val +=1 
+    # return the heuristic value
+    return h_val
+    
+# this function is used to explore the current state: curr
+def getStates(curr):
+    
+    heuristic_now = heuristic(curr)
+    
+    if(heuristic_now <= heuristic(left(curr)) and left(curr) not in visited ):
+        return left(curr)
+    if(heuristic_now <= heuristic(down(curr)) and down(curr) not in visited ):
+        return down(curr)
+    if(heuristic_now <= heuristic(up(curr)) and up(curr) not in visited ):
+        return up(curr)
+    if(heuristic_now <= heuristic(right(curr)) and right(curr) not in visited ):
+        return right(curr)
+    
+    return -1
+# this function is used to print the state formed in a board format
+def display(state):
+    for i in state:
+        for j in i:
+            print(j, end='')
+        print()
+    print()
+
+# this function is the driver function 
+def EightPuzzle():
+    # if the inital state is already the goal state then return the same thing back
+    if compare(s):
+        return s
+    # else define a current state
+    curr = s
+    # call on teh globally defined steps variable
+    global steps
+    
+    # while the current state is not same as goal state
+    while(compare(curr)==0):
+            # increment the steps by one
+            steps+=1
+            # display the current state
+            print("step ",steps)
+            display(curr)
+            # add this state to the visited state array
+            visited.append(curr)
+            # find the new current state, the next move, as per algorithm
+            curr = getStates(curr)
+            # if no new state is available: fialure returned by getStates function
+            if (curr == -1):
+                # print no solution
+                return "no solution"
+    # else return the current state, which will be goal state after the while loop ends
+    return curr
+
+# call the driver function
+EightPuzzle()
+# print the total number of steps required
+print("The total number of steps are: ",steps)
+print ("*********END*********")
+
+
+
+
+AO*
+
+def Cost(H, condition, weight = 1):
+    cost = {}
+    if 'AND' in condition:
+        AND_nodes = condition['AND']
+        Path_A = ' AND '.join(AND_nodes)
+        PathA = sum(H[node]+weight for node in AND_nodes)
+        cost[Path_A] = PathA
+ 
+    if 'OR' in condition:
+        OR_nodes = condition['OR']
+        Path_B =' OR '.join(OR_nodes)
+        PathB = min(H[node]+weight for node in OR_nodes)
+        cost[Path_B] = PathB
+    return cost
+ 
+# Update the cost
+def update_cost(H, Conditions, weight=1):
+    Main_nodes = list(Conditions.keys())
+    Main_nodes.reverse()
+    least_cost= {}
+    for key in Main_nodes:
+        condition = Conditions[key]
+        print(key,':', Conditions[key],'>>>', Cost(H, condition, weight))
+        c = Cost(H, condition, weight)
+        H[key] = min(c.values())
+        least_cost[key] = Cost(H, condition, weight)           
+    return least_cost
+ 
+# Print the shortest path
+def shortest_path(Start,Updated_cost, H):
+    Path = Start
+    if Start in Updated_cost.keys():
+        Min_cost = min(Updated_cost[Start].values())
+        key = list(Updated_cost[Start].keys())
+        values = list(Updated_cost[Start].values())
+        Index = values.index(Min_cost)
+         
+        # FIND MINIMIMUM PATH KEY
+        Next = key[Index].split()
+        # ADD TO PATH FOR OR PATH
+        if len(Next) == 1:
+ 
+            Start =Next[0]
+            Path += '<--' +shortest_path(Start, Updated_cost, H)
+        # ADD TO PATH FOR AND PATH
+        else:
+            Path +='<--('+key[Index]+') '
+ 
+            Start = Next[0]
+            Path += '[' +shortest_path(Start, Updated_cost, H) + ' + '
+ 
+            Start = Next[-1]
+            Path +=  shortest_path(Start, Updated_cost, H) + ']'
+ 
+    return Path
+         
+        
+ 
+H = {'A': -1, 'B': 5, 'C': 2, 'D': 4, 'E': 7, 'F': 9, 'G': 3, 'H': 0, 'I':0, 'J':0}
+ 
+Conditions = {
+ 'A': {'OR': ['B'], 'AND': ['C', 'D']},
+ 'B': {'OR': ['E', 'F']},
+ 'C': {'OR': ['G'], 'AND': ['H', 'I']},
+ 'D': {'OR': ['J']}
+}
+# weight
+weight = 1
+# Updated cost
+print('Updated Cost :')
+Updated_cost = update_cost(H, Conditions, weight=1)
+print('*'*75)
+print('Shortest Path :\n',shortest_path('A', Updated_cost,H))
+
+
+
+
+*************BFS********************************************************************************
+
+
+import copy
+
+intial_state=[[2],[3,1],[]]
+goal_state=[[[3,2,1],[],[]],[[],[3,2,1],[]],[[],[],[3,2,1]]]
+
+open=[[intial_state,None]]
+closed=[]
+visited=[]
+
+def block(open,closed):
+    while open:
+        temp=open.pop(0)
+        closed.append(temp)
+        if temp[0] not in visited:
+            visited.append(temp[0])
+        if temp[0] in goal_state:
+            pathgenerator(closed,temp[1],temp[0])
+            print('success')
+            # print(closed)
+            exit()
+        else:
+            next=movegen(temp[0])
+            for i in next:
+                if i not in visited:
+                    open.append([i,temp[0]])
+                    visited.append(i)
+
+def movegen(curr):
+    list=[]
+    temp=copy.deepcopy(curr)
+    if(len(temp[1])<3 and len(temp[0])!=0):
+        temp1=temp[0].pop(0)
+        temp[1].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[2])<3 and len(temp[0])!=0):
+        temp1=temp[0].pop(0)
+        temp[2].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[0])<3 and len(temp[1])!=0):
+        temp1=temp[1].pop(0)
+        temp[0].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[2])<3 and len(temp[1])!=0):
+        temp1=temp[1].pop(0)
+        temp[2].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[0])<3 and len(temp[2])!=0):
+        temp1=temp[2].pop(0)
+        temp[0].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[1])<3 and len(temp[2])!=0):
+        temp1=temp[2].pop(0)
+        temp[1].insert(0,temp1)
+        list.append(temp)
+    return list
+
+def pathgenerator(closed,parent,goal):
+    if parent==None:
+        print('->',goal)
+        return
+    for i in closed:
+        if i[0]==goal:
+            for j in closed:
+                if j[0]==i[1]:
+                    pathgenerator(closed,j[1],j[0])
+                    print('->',i[0])
+                    return
+
+block(open,closed)
+
+
+
+
+**************************************DFS*************************************************
+
+
+import copy
+
+intial_state=[[1],[3,2],[]]
+goal_state=[[[3,2,1],[],[]],[[],[3,2,1],[]],[[],[],[3,2,1]]]
+
+
+closed=[]
+visited=[]
+
+def block(curr,parent):
+    if(curr not in visited):
+        closed.append([curr,parent])
+        visited.append(curr)
+        if curr in goal_state:
+            print("success")
+            pathgenerator(closed,parent,curr)
+            exit(1)
+        list=movegen(curr)
+        for next in list:
+            if next not in visited:
+                block(next,curr)
+
+def movegen(curr):
+    list=[]
+    temp=copy.deepcopy(curr)
+    if(len(temp[1])<3 and len(temp[0])!=0):
+        temp1=temp[0].pop(0)
+        temp[1].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[2])<3 and len(temp[0])!=0):
+        temp1=temp[0].pop(0)
+        temp[2].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[0])<3 and len(temp[1])!=0):
+        temp1=temp[1].pop(0)
+        temp[0].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[2])<3 and len(temp[1])!=0):
+        temp1=temp[1].pop(0)
+        temp[2].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[0])<3 and len(temp[2])!=0):
+        temp1=temp[2].pop(0)
+        temp[0].insert(0,temp1)
+        list.append(temp)
+    temp=copy.deepcopy(curr)
+    if(len(temp[1])<3 and len(temp[2])!=0):
+        temp1=temp[2].pop(0)
+        temp[1].insert(0,temp1)
+        list.append(temp)
+    return list
+
+def pathgenerator(closed,parent,goal):
+    if parent==None:
+        print('->',goal)
+        return
+    for i in closed:
+        if i[0]==goal:
+            for j in closed:
+                if j[0]==i[1]:
+                    pathgenerator(closed,j[1],j[0])
+                    print('->',i[0])
+                    return
+# print(movegen(intial_state))
+block(intial_state,None)
+
+
+
+
+
+
+****************----------A* ---------------------------------
+
+import heapq
+import math
+
+class Graph:
+    def __init__(self, edges):
+        self.edges = edges
+        self.nodes = set(sum(([edge[0], edge[1]] for edge in self.edges), []))
+
+    def neighbors(self, node):
+        return set([edge[1] for edge in self.edges if edge[0] == node])
+
+    def cost(self, from_node, to_node):
+        for edge in self.edges:
+            if from_node == edge[0] and to_node == edge[1]:
+                return edge[2]
+        return math.inf
+
+def astar(graph, start, goal):
+    pq = [(0, start)]
+    visited = set()
+    came_from = {}
+    cost_so_far = {}
+    came_from[start] = None
+    cost_so_far[start] = 0
+
+    while pq:
+        _, current = heapq.heappop(pq)
+        if current == goal:
+            break
+        visited.add(current)
+
+        for next in graph.neighbors(current):
+            new_cost = cost_so_far[current] + graph.cost(current, next)
+            if next not in cost_so_far or new_cost < cost_so_far[next]:
+                cost_so_far[next] = new_cost
+                priority = new_cost + heuristic(next, goal)
+                heapq.heappush(pq, (priority, next))
+                came_from[next] = current
+
+    path = []
+    current = goal
+    while current != start:
+        path.append(current)
+        current = came_from[current]
+    path.append(start)
+    path.reverse()
+
+    return path, cost_so_far[goal]
+
+def heuristic(node, goal):
+    x1 = ord(node) - 65
+    y1 = 0
+    x2 = ord(goal) - 65
+    y2 = 0
+    return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+
+# Define the graph
+graph = Graph([
+    ('A', 'B', 2),
+    ('A', 'C', 4),
+    ('B', 'D', 5),
+    ('B', 'E', 12),
+    ('C', 'F', 3),
+    ('D', 'G', 6),
+    ('E', 'F', 7),
+    ('E', 'H', 10),
+    ('F', 'H', 2),
+    ('G', 'H', 3)
+])
+
+# Define the start and goal nodes
+start = 'A'
+goal = 'H'
+
+# Run the A* algorithm on the graph
+path,cost = astar(graph, start, goal)
+
+# Print the results
+print('Path:', path)
+print('Cost:', cost)
+
+
+
+***************************************TSP**************************************************
+from sys import maxsize
+v=int(input("Enter the number of nodes:"))
+
+def travel(graph,s):
+    vertex=[]
+    for i in range(v):
+        if i!=s:
+            vertex.append(i)
+
+    minpath=maxsize
+
+    while True:
+        present_cost=0
+        k=s
+        for i in range(len(vertex)):
+            present_cost+=graph[k][vertex[i]]
+            k=vertex[i]
+            
+        present_cost+=graph[k][s]
+        minpath=min(minpath,present_cost)
+
+    
+        if not permutations(vertex):
+            print("The path followed is:",vertex[::-1])
+            break
+    return minpath
+
+
+
+def permutations(l):
+        a=len(l)
+        i=a-2
+        
+        while (i>=0 and l[i]>l[i+1]):
+            i-=1
+            
+        if i==-1:
+            return False
+            
+            
+        j=i+1
+        while j<a and l[j]>l[i]:
+            j+=1
+            
+        j-=1
+        l[i],l[j]=l[j],l[i]
+        left=i+1
+        right=a-1
+        
+        while left<right:
+            l[left],l[right]=l[right],l[left]
+            left+= 1
+            right-=1
+        return True
+        
+
+graph=[[0,10,15,20],[10,0,35,25],[15,35,0,30],[20,25,30,0]]
+s=int(input("Enter the starting node:"))
+travel(graph,s)
+
+
+
+********************************WATER JUG*****************************************************************
+
+import copy
+
+l=int(input('enter the value of target water amount: '))
+
+initial_state=[0,0]
+open=[[initial_state,None]]
+closed=[]
+visited=[]
+
+def bfs(open,closed):
+    while open:
+        temp=open.pop(0)
+        closed.append(temp)
+        if temp[0] not in visited:
+            visited.append(temp[0])
+        if temp[0][0]==l or temp[0][1]==l:
+            pathgenerator(closed,temp[1],temp[0])
+            print('success')
+            # print(closed)
+            return
+        else:
+            next=movegen(temp[0])
+            for i in next:
+                if i not in visited:
+                    open.append([i,temp[0]])
+                    visited.append(i)
+def pathgenerator(closed,parent,goal):
+    if parent==None:
+        print('->',goal)
+        return
+    for i in closed:
+        if i[0]==goal:
+            for j in closed:
+                if j[0]==i[1]:
+                    pathgenerator(closed,j[1],j[0])
+                    print('->',i[0])
+                    return    
+
+def movegen(curr):
+    next=[]
+    c=copy.copy(curr)
+    temp=fillx(c)
+    if temp not in visited and temp not in next:
+        next.append(temp)
+    c=copy.copy(curr)
+    temp=filly(c)
+    if temp not in visited and temp not in next:
+        next.append(temp)
+    c=copy.copy(curr)
+    temp=emptyx(c)
+    if temp not in visited and temp not in next:
+        next.append(temp)
+    c=copy.copy(curr)
+    temp=emptyy(c)
+    if temp not in visited and temp not in next:
+        next.append(temp)
+    c=copy.copy(curr)
+    temp=xtoy(c)
+    if temp not in visited and temp not in next:
+        next.append(temp)
+    c=copy.copy(curr)
+    temp=ytox(c)
+    if temp not in visited and temp not in next:
+        next.append(temp)
+    return(next)
+
+def fillx(c):
+    c[0]=4
+    return c
+
+def filly(c):
+    c[1]=3
+    return c
+
+def emptyx(c):
+    c[0]=0
+    return c
+
+def emptyy(c):
+    c[1]=0
+    return c
+
+def xtoy(c):
+    if(c[0]+c[1]>3):
+        c[0]=c[0]-(3-c[1])
+        c[1]=3
+    else:
+        c[1]=c[1]+c[0]
+        c[0]=0
+    return c
+
+def ytox(c):
+    if(c[0]+c[1]>4):
+        c[1]=c[1]-(4-c[0])
+        c[0]=4
+    else:
+        c[0]=c[1]+c[0]
+        c[1]=0
+    return c
+
+
+
+bfs(open,closed)
